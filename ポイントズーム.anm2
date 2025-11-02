@@ -1,0 +1,49 @@
+--information:ポイントズーム v1.0.0 by azurite
+--label:変形
+--track@zoom:拡大率,0,10000,100,0.001
+--track0:X,-4000,4000,0,0.1
+--track1:Y,-4000,4000,0,0.1
+--select@sampler:領域外,クリップ=1,引き伸ばし=2,ループ=3,ミラー=4
+--check@interp:補間なし,false
+--value@PI:PI,{}
+
+--[[pixelshader@psmain:
+Texture2D<float4> src : register(t0);
+SamplerState samp : register(s0);
+cbuffer constant0 : register(b0) {
+    float2 center;
+    float zoom;
+}
+
+float4 psmain(float4 pos : SV_Position, float2 uv : TEXCOORD) : SV_Target {
+    float2 delta = uv - center;
+    float2 zoomed_uv = center + delta / zoom;
+    return src.Sample(samp, zoomed_uv);
+}
+]]
+
+local function clamp(x, min, max)
+    if x < min then return min end
+    if x > max then return max end
+    return x
+end
+
+zoom = tonumber(PI[1]) or zoom
+local x = tonumber(PI[2]) or obj.track0
+local y = tonumber(PI[3]) or obj.track1
+sampler = tonumber(PI[4]) or sampler
+if type(PI[5]) == "boolean" then interp = PI[5]
+elseif type(PI[5]) == "number" then interp = (PI[5] ~= 0)
+end
+
+zoom = clamp(zoom, 1e-5, 10000)
+x = clamp(x, -4000, 4000)
+y = clamp(y, -4000, 4000)
+sampler = clamp(sampler, 1, 4)
+
+local n = obj.setanchor("track", 0, "line")
+x, y = (x + obj.w * 0.5) / obj.w, (y + obj.h * 0.5) / obj.h
+local sampler_state = {"clip", "clamp", "loop", "mirror", "dot"}
+if interp then sampler = 5 end
+
+obj.pixelshader("psmain", "object", "object", {x, y, zoom / 100}, "copy", sampler_state[sampler])
