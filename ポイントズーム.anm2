@@ -1,8 +1,8 @@
 --information:ポイントズーム v1.0.0 by azurite
 --label:変形
 --track@zoom:拡大率,0,10000,100,0.001
---track0:X,-4000,4000,0,0.1
---track1:Y,-4000,4000,0,0.1
+--track0:X,-4000,4000,0,0.001
+--track1:Y,-4000,4000,0,0.001
 --select@sampler:領域外,クリップ=1,引き伸ばし=2,ループ=3,ミラー=4
 --check@interp:補間なし,false
 --value@PI:PI,{}
